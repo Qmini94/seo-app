@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { RelatedKeyword } from "@/services/naver/searchAd";
 import KeywordSearch from "./_components/KeywordSearch";
 import KeywordResult from "./_components/KeywordResult";
+import OpportunityChart from "./_components/OpportunityChart";
 
 interface ApiResponse {
   seed: string;
@@ -61,7 +62,10 @@ export default function KeywordsPage() {
       )}
 
       {result && !isLoading && (
-        <KeywordResult seed={result.seed} keywords={result.keywords} />
+        <>
+          <OpportunityChart keywords={result.keywords} />
+          <KeywordResult seed={result.seed} keywords={result.keywords} />
+        </>
       )}
     </div>
   );
