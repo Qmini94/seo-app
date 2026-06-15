@@ -6,8 +6,7 @@ import { Separator } from "@/components/ui/separator";
 
 const NAV_ITEMS = [
   { href: "/keywords", label: "키워드 리서치", icon: "🔍" },
-  // 추후 추가
-  // { href: "/serp", label: "SERP 분석", icon: "📊" },
+  { href: "/serp", label: "SERP 분석", icon: "📊" },
   // { href: "/audit", label: "사이트 진단", icon: "🩺" },
   // { href: "/rank", label: "순위 추적", icon: "📈" },
 ];
