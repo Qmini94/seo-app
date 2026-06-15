@@ -71,11 +71,28 @@ export default function KeywordResult({ seed, keywords }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>("opportunity");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterCompetition, setFilterCompetition] = useState<string>("all");
+  const [filterIntent, setFilterIntent] = useState<string>("all");
+  const [filterMinSearch, setFilterMinSearch] = useState<string>("");
+  const [filterMaxSearch, setFilterMaxSearch] = useState<string>("");
 
   const filtered = useMemo(() => {
-    if (filterCompetition === "all") return keywords;
-    return keywords.filter((kw) => kw.competition === filterCompetition);
-  }, [keywords, filterCompetition]);
+    let result = keywords;
+    if (filterCompetition !== "all") {
+      result = result.filter((kw) => kw.competition === filterCompetition);
+    }
+    if (filterIntent !== "all") {
+      result = result.filter((kw) => kw.intent === filterIntent);
+    }
+    const min = parseInt(filterMinSearch, 10);
+    if (!isNaN(min)) {
+      result = result.filter((kw) => kw.monthlyTotalSearch >= min);
+    }
+    const max = parseInt(filterMaxSearch, 10);
+    if (!isNaN(max)) {
+      result = result.filter((kw) => kw.monthlyTotalSearch <= max);
+    }
+    return result;
+  }, [keywords, filterCompetition, filterIntent, filterMinSearch, filterMaxSearch]);
 
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
@@ -117,27 +134,73 @@ export default function KeywordResult({ seed, keywords }: Props) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="space-y-3 mb-4">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold">연관 키워드</h3>
           <Badge variant="outline">{sorted.length}개</Badge>
-          {filterCompetition !== "all" && (
+          {sorted.length !== keywords.length && (
             <Badge variant="outline">
               전체 {keywords.length}개 중 필터링
             </Badge>
           )}
         </div>
 
-        <select
-          value={filterCompetition}
-          onChange={(e) => setFilterCompetition(e.target.value)}
-          className="rounded-md border px-3 py-1.5 text-sm bg-background"
-        >
-          <option value="all">경쟁도: 전체</option>
-          <option value="낮음">경쟁도: 낮음</option>
-          <option value="중간">경쟁도: 중간</option>
-          <option value="높음">경쟁도: 높음</option>
-        </select>
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={filterCompetition}
+            onChange={(e) => setFilterCompetition(e.target.value)}
+            className="rounded-md border px-3 py-1.5 text-sm bg-background"
+          >
+            <option value="all">경쟁도: 전체</option>
+            <option value="낮음">경쟁도: 낮음</option>
+            <option value="중간">경쟁도: 중간</option>
+            <option value="높음">경쟁도: 높음</option>
+          </select>
+
+          <select
+            value={filterIntent}
+            onChange={(e) => setFilterIntent(e.target.value)}
+            className="rounded-md border px-3 py-1.5 text-sm bg-background"
+          >
+            <option value="all">검색 의도: 전체</option>
+            <option value="informational">정보형</option>
+            <option value="commercial">상업형</option>
+            <option value="transactional">거래형</option>
+            <option value="navigational">탐색형</option>
+          </select>
+
+          <div className="flex items-center gap-1">
+            <input
+              type="number"
+              placeholder="최소 검색량"
+              value={filterMinSearch}
+              onChange={(e) => setFilterMinSearch(e.target.value)}
+              className="w-28 rounded-md border px-3 py-1.5 text-sm bg-background"
+            />
+            <span className="text-muted-foreground text-sm">~</span>
+            <input
+              type="number"
+              placeholder="최대 검색량"
+              value={filterMaxSearch}
+              onChange={(e) => setFilterMaxSearch(e.target.value)}
+              className="w-28 rounded-md border px-3 py-1.5 text-sm bg-background"
+            />
+          </div>
+
+          {(filterCompetition !== "all" || filterIntent !== "all" || filterMinSearch || filterMaxSearch) && (
+            <button
+              onClick={() => {
+                setFilterCompetition("all");
+                setFilterIntent("all");
+                setFilterMinSearch("");
+                setFilterMaxSearch("");
+              }}
+              className="rounded-md border px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground"
+            >
+              필터 초기화
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="rounded-md border overflow-x-auto">
