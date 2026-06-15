@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRelatedKeywords } from "@/services/naver/searchAd";
+import { getRelatedKeywords } from "@/features/keyword/keyword.service";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);

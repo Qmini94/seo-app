@@ -9,24 +9,27 @@ app/                          # Next.js App Router (라우팅 + 페이지)
 │   └── 페이지명/
 │       ├── page.tsx          # 페이지 컴포넌트
 │       └── _components/      # 이 페이지 전용 컴포넌트 (co-location)
-├── api/                      # Route Handlers (백엔드 API)
+├── api/                      # Route Handlers (컨트롤러 — 비즈니스 로직 ZERO)
 
-components/ui/                # 공용 UI 컴포넌트 (shadcn/ui 등, 여러 페이지에서 재사용)
-components/charts/            # 공용 차트 컴포넌트 (추후)
-
-features/                     # 도메인 비즈니스 로직 (추후)
+features/                     # 도메인 비즈니스 로직 (서비스 레이어)
 ├── keyword/                  # service, repository, schema, types
 ├── serp/
 └── ...
 
-infrastructure/               # 외부 연동 (추후)
+infrastructure/               # 외부 연동 (게이트웨이 레이어)
 ├── naver/                    # 네이버 API 클라이언트
+├── database/                 # Prisma 싱글턴
 ├── cache/
 └── crawler/
 
-services/                     # 현재 API 클라이언트 (→ 추후 infrastructure/로 이동)
-shared/                       # 도메인 무관 공용 (config, errors, utils) (추후)
-lib/                          # Prisma 등 인프라 싱글턴
+shared/                       # 도메인 무관 공용
+├── config/                   # 환경변수 검증
+├── errors/                   # 커스텀 에러 클래스
+├── types/                    # 공용 타입 (ApiResponse 등)
+└── utils/
+
+components/ui/                # 공용 UI 컴포넌트 (shadcn/ui)
+lib/                          # shadcn/ui 유틸 (cn 함수)
 ```
 
 ## 컴포넌트 배치 규칙

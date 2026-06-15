@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { RelatedKeyword } from "@/services/naver/searchAd";
+import type { RelatedKeyword } from "@/features/keyword/keyword.types";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,

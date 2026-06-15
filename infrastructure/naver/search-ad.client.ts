@@ -21,17 +21,17 @@ function buildHeaders(method: string, uri: string): Record<string, string> {
   };
 }
 
-export interface RelatedKeyword {
+export interface NaverKeywordRaw {
   keyword: string;
   monthlyPcSearch: number;
   monthlyMobileSearch: number;
   monthlyTotalSearch: number;
-  competition: string; // 높음 / 중간 / 낮음
-  monthlyAvePcClick: number; // 월평균 PC 클릭수
-  monthlyAveMobileClick: number; // 월평균 모바일 클릭수
-  monthlyAveTotalClick: number; // 월평균 총 클릭수
-  pcCtr: number; // PC 클릭률 (%)
-  mobileCtr: number; // 모바일 클릭률 (%)
+  competition: string;
+  monthlyAvePcClick: number;
+  monthlyAveMobileClick: number;
+  monthlyAveTotalClick: number;
+  pcCtr: number;
+  mobileCtr: number;
 }
 
 // 네이버는 검색량 적은 키워드에 숫자 대신 "< 10" 문자열을 준다 → 숫자로 정리
@@ -41,7 +41,7 @@ function parseCount(v: number | string): number {
   return Number.isNaN(n) ? 0 : n;
 }
 
-export async function getRelatedKeywords(seed: string): Promise<RelatedKeyword[]> {
+export async function fetchRelatedKeywords(seed: string): Promise<NaverKeywordRaw[]> {
   const uri = "/keywordstool";
   const params = new URLSearchParams({
     hintKeywords: seed.replace(/\s/g, ""), // 네이버는 공백 제거 권장

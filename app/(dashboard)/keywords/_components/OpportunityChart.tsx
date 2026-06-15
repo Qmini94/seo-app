@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import type { RelatedKeyword } from "@/services/naver/searchAd";
+import type { RelatedKeyword } from "@/features/keyword/keyword.types";
 
 interface Props {
   keywords: RelatedKeyword[];
