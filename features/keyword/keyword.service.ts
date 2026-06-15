@@ -1,5 +1,6 @@
 import { fetchRelatedKeywords } from "@/infrastructure/naver/search-ad.client";
 import { classifyIntent } from "./intent.classifier";
+import { scoreRelevance } from "./relevance.scorer";
 import type { RelatedKeyword } from "./keyword.types";
 
 export async function getRelatedKeywords(seed: string): Promise<RelatedKeyword[]> {
@@ -17,5 +18,6 @@ export async function getRelatedKeywords(seed: string): Promise<RelatedKeyword[]
     pcCtr: k.pcCtr,
     mobileCtr: k.mobileCtr,
     intent: classifyIntent(k.keyword),
+    relevance: scoreRelevance(seed, k.keyword),
   }));
 }

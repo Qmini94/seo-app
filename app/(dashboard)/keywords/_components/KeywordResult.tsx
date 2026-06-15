@@ -33,7 +33,8 @@ type SortKey =
   | "monthlyAveTotalClick"
   | "pcCtr"
   | "mobileCtr"
-  | "intent";
+  | "intent"
+  | "relevance";
 
 const intentOrder: Record<SearchIntent, number> = {
   transactional: 4,
@@ -150,6 +151,7 @@ export default function KeywordResult({ seed, keywords }: Props) {
               <SortableHead sortKey="monthlyAveTotalClick" label="월간 클릭" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
               <SortableHead sortKey="pcCtr" label="PC CTR" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
               <SortableHead sortKey="mobileCtr" label="모바일 CTR" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
+              <SortableHead sortKey="relevance" label="관련성" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
               <SortableHead sortKey="intent" label="검색 의도" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
             </TableRow>
           </TableHeader>
@@ -183,6 +185,11 @@ export default function KeywordResult({ seed, keywords }: Props) {
                 </TableCell>
                 <TableCell className="text-right text-muted-foreground">
                   {formatPercent(kw.mobileCtr)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <span className={kw.relevance >= 70 ? "font-semibold text-green-600" : kw.relevance >= 40 ? "text-foreground" : "text-muted-foreground"}>
+                    {kw.relevance}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <Badge variant={(intentColor[kw.intent] as any) ?? "outline"}>

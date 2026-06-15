@@ -12,4 +12,5 @@ export interface RelatedKeyword {
   pcCtr: number;
   mobileCtr: number;
   intent: SearchIntent;
+  relevance: number; // 0~100, 시드 대비 관련성
 }
