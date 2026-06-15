@@ -1,4 +1,5 @@
 import { fetchRelatedKeywords } from "@/infrastructure/naver/search-ad.client";
+import { classifyIntent } from "./intent.classifier";
 import type { RelatedKeyword } from "./keyword.types";
 
 export async function getRelatedKeywords(seed: string): Promise<RelatedKeyword[]> {
@@ -15,5 +16,6 @@ export async function getRelatedKeywords(seed: string): Promise<RelatedKeyword[]
     monthlyAveTotalClick: k.monthlyAveTotalClick,
     pcCtr: k.pcCtr,
     mobileCtr: k.mobileCtr,
+    intent: classifyIntent(k.keyword),
   }));
 }

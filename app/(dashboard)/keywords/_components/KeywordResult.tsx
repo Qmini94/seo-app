@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import type { RelatedKeyword } from "@/features/keyword/keyword.types";
+import { INTENT_LABEL, type SearchIntent } from "@/features/keyword/intent.classifier";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -31,7 +32,22 @@ type SortKey =
   | "competition"
   | "monthlyAveTotalClick"
   | "pcCtr"
-  | "mobileCtr";
+  | "mobileCtr"
+  | "intent";
+
+const intentOrder: Record<SearchIntent, number> = {
+  transactional: 4,
+  commercial: 3,
+  informational: 2,
+  navigational: 1,
+};
+
+const intentColor: Record<SearchIntent, string> = {
+  transactional: "destructive",
+  commercial: "default",
+  informational: "secondary",
+  navigational: "outline",
+};
 
 type SortDir = "asc" | "desc";
 
@@ -68,6 +84,8 @@ export default function KeywordResult({ seed, keywords }: Props) {
         cmp =
           (competitionOrder[a.competition] ?? 0) -
           (competitionOrder[b.competition] ?? 0);
+      } else if (sortKey === "intent") {
+        cmp = (intentOrder[a.intent] ?? 0) - (intentOrder[b.intent] ?? 0);
       } else {
         cmp = a[sortKey] - b[sortKey];
       }
@@ -132,6 +150,7 @@ export default function KeywordResult({ seed, keywords }: Props) {
               <SortableHead sortKey="monthlyAveTotalClick" label="월간 클릭" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
               <SortableHead sortKey="pcCtr" label="PC CTR" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
               <SortableHead sortKey="mobileCtr" label="모바일 CTR" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
+              <SortableHead sortKey="intent" label="검색 의도" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -164,6 +183,11 @@ export default function KeywordResult({ seed, keywords }: Props) {
                 </TableCell>
                 <TableCell className="text-right text-muted-foreground">
                   {formatPercent(kw.mobileCtr)}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={(intentColor[kw.intent] as any) ?? "outline"}>
+                    {INTENT_LABEL[kw.intent]}
+                  </Badge>
                 </TableCell>
               </TableRow>
             ))}

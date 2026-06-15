@@ -1,3 +1,5 @@
+import type { SearchIntent } from "./intent.classifier";
+
 export interface RelatedKeyword {
   keyword: string;
   monthlyPcSearch: number;
@@ -9,4 +11,5 @@ export interface RelatedKeyword {
   monthlyAveTotalClick: number;
   pcCtr: number;
   mobileCtr: number;
+  intent: SearchIntent;
 }
