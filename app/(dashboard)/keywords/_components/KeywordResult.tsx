@@ -34,7 +34,8 @@ type SortKey =
   | "pcCtr"
   | "mobileCtr"
   | "intent"
-  | "relevance";
+  | "relevance"
+  | "opportunity";
 
 const intentOrder: Record<SearchIntent, number> = {
   transactional: 4,
@@ -67,7 +68,7 @@ function formatPercent(n: number): string {
 }
 
 export default function KeywordResult({ seed, keywords }: Props) {
-  const [sortKey, setSortKey] = useState<SortKey>("monthlyTotalSearch");
+  const [sortKey, setSortKey] = useState<SortKey>("opportunity");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterCompetition, setFilterCompetition] = useState<string>("all");
 
@@ -143,7 +144,8 @@ export default function KeywordResult({ seed, keywords }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <SortableHead sortKey="keyword" label="키워드" className="w-[240px]" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
+              <SortableHead sortKey="keyword" label="키워드" className="w-[200px]" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
+              <SortableHead sortKey="opportunity" label="기회 점수" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
               <SortableHead sortKey="monthlyTotalSearch" label="월간 검색량" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
               <SortableHead sortKey="monthlyPcSearch" label="PC" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
               <SortableHead sortKey="monthlyMobileSearch" label="모바일" className="text-right" currentKey={sortKey} indicator={sortIndicator} onClick={handleSort} />
@@ -159,6 +161,15 @@ export default function KeywordResult({ seed, keywords }: Props) {
             {sorted.map((kw) => (
               <TableRow key={kw.keyword}>
                 <TableCell className="font-medium">{kw.keyword}</TableCell>
+                <TableCell className="text-right">
+                  <span className={
+                    kw.opportunity >= 60 ? "font-bold text-green-600" :
+                    kw.opportunity >= 30 ? "font-semibold text-foreground" :
+                    "text-muted-foreground"
+                  }>
+                    {kw.opportunity}
+                  </span>
+                </TableCell>
                 <TableCell className="text-right">
                   {formatNumber(kw.monthlyTotalSearch)}
                 </TableCell>

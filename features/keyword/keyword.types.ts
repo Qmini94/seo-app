@@ -13,4 +13,5 @@ export interface RelatedKeyword {
   mobileCtr: number;
   intent: SearchIntent;
   relevance: number; // 0~100, 시드 대비 관련성
+  opportunity: number; // 0~100, 종합 기회 점수
 }
