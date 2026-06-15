@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SEO App
 
-## Getting Started
+네이버 키워드 리서치 및 SEO 분석 도구.
 
-First, run the development server:
+## 기술 스택
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript (strict)
+- Tailwind CSS v4 + shadcn/ui
+- Prisma (PostgreSQL)
+
+## 시작하기
 
 ```bash
+# 의존성 설치
+npm install
+
+# DB 마이그레이션
+npx prisma generate
+
+# 개발 서버
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 환경변수
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`.env.local` 파일에 아래 값 설정:
 
-## Learn More
+```
+DATABASE_URL=postgresql://...
+NAVER_AD_API_KEY=
+NAVER_AD_SECRET_KEY=
+NAVER_AD_CUSTOMER_ID=
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 주요 기능
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- 키워드 리서치: 네이버 검색광고 API 기반 연관 키워드 확장, 검색량/경쟁도/CTR 분석
+- 정렬/필터: 컬럼별 정렬, 경쟁도 필터링
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 디렉토리 구조
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/                  # Next.js App Router
+├── (dashboard)/      # 대시보드 레이아웃 그룹
+│   └── keywords/     # 키워드 리서치 페이지
+├── api/              # Route Handlers
+components/ui/        # shadcn/ui 공용 컴포넌트
+services/             # 외부 API 클라이언트
+lib/                  # Prisma 등 인프라 싱글턴
+prisma/               # DB 스키마
+```
