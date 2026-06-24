@@ -35,6 +35,8 @@ export function generatePrescription(
     aiBriefing: {
       active: serpAnalysis.aiBriefing.exists,
       citedCount: serpAnalysis.aiBriefing.citedUrls.length,
+      hasWebGen: serpAnalysis.aiBriefing.hasWebGen,
+      sources: serpAnalysis.aiBriefing.sources,
     },
     spec,
     channelDistribution: channelDist,

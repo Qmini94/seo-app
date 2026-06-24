@@ -42,10 +42,21 @@ export interface SerpSection {
   results: SerpResult[];
 }
 
+/** AI 브리핑 개별 인용 소스 */
+export interface AiBriefingSource {
+  url: string;
+  domain: string;
+  title: string;
+  aiDescription: string; // AI가 생성한 사이트 설명
+}
+
 /** AI 브리핑 분석 */
 export interface AiBriefingData {
   exists: boolean;
   citedUrls: string[];
+  sources: AiBriefingSource[];
+  /** web_gen 영역 존재 여부 (AI 생성 검색결과) */
+  hasWebGen: boolean;
 }
 
 /** SERP 전체 분석 결과 */
@@ -79,6 +90,8 @@ export interface ContentPrescription {
   aiBriefing: {
     active: boolean;
     citedCount: number;
+    hasWebGen: boolean;
+    sources: AiBriefingSource[];
   };
   spec: {
     titleLength: { min: number; max: number; avg: number };
