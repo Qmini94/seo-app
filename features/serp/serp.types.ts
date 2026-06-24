@@ -132,3 +132,44 @@ export interface AiCitedComparison {
   /** AI가 선호하는 패턴 요약 */
   patterns: string[];
 }
+
+/** ISR 처방전 — AI 브리핑 인용 최적화 가이드 */
+export interface IsrPrescription {
+  keyword: string;
+  /** AI 브리핑 활성 여부 */
+  aiBriefingActive: boolean;
+  /** ISR 난이도 (AI가 이미 인용 중인 경쟁 강도) */
+  difficulty: "easy" | "moderate" | "hard";
+  /** 콘텐츠 구조 권장 스펙 */
+  contentSpec: {
+    /** 권장 본문 길이 (글자 수) */
+    bodyLength: { min: number; recommended: number };
+    /** 권장 소제목(H2) 수 */
+    h2Count: { min: number; recommended: number };
+    /** 권장 이미지 수 */
+    imageCount: { min: number; recommended: number };
+    /** 키워드 밀도 (%) */
+    keywordDensity: { min: number; max: number };
+    /** 권장 콘텐츠 형태 */
+    contentType: ContentType;
+  };
+  /** ISR 전략 항목들 */
+  strategies: IsrStrategy[];
+  /** 콘텐츠 작성 체크리스트 */
+  checklist: string[];
+  /** AI 인용 패턴 기반 인사이트 (Claude 분석 결과 통합) */
+  aiInsights: {
+    commonTraits: string[];
+    recommendations: string[];
+    preferredFormat: string;
+    commonExpressions: string[];
+  } | null;
+}
+
+/** ISR 전략 항목 */
+export interface IsrStrategy {
+  category: "structure" | "content" | "authority" | "format";
+  priority: "high" | "medium" | "low";
+  title: string;
+  description: string;
+}

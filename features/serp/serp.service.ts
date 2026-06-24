@@ -2,8 +2,9 @@ import { crawlNaverSerp, crawlContentPage } from "@/infrastructure/crawler/serp.
 import { parseSerpHtml } from "./serp.parser";
 import { analyzeContent } from "./content.analyzer";
 import { generatePrescription } from "./prescription.generator";
+import { generateIsrPrescription } from "./isr-prescription.generator";
 import { analyzeAiCitationPattern, type AiPatternAnalysis } from "./ai-pattern.analyzer";
-import type { SerpAnalysis, ContentStructure, ContentPrescription } from "./serp.types";
+import type { SerpAnalysis, ContentStructure, ContentPrescription, IsrPrescription } from "./serp.types";
 
 const MAX_CONTENT_CRAWL = 5;   // 일반 상위 콘텐츠 최대 크롤링 수
 const MAX_AI_CITED_CRAWL = 3;  // AI 인용 콘텐츠 최대 크롤링 수
@@ -22,6 +23,7 @@ export async function analyzeSerpForKeyword(keyword: string): Promise<{
   serpAnalysis: SerpAnalysis;
   contentStructures: ContentStructure[];
   prescription: ContentPrescription;
+  isrPrescription: IsrPrescription;
   aiPatternAnalysis: AiPatternAnalysis | null;
 }> {
   // 1) SERP 크롤링 + 파싱
@@ -78,7 +80,15 @@ export async function analyzeSerpForKeyword(keyword: string): Promise<{
     );
   }
 
-  return { serpAnalysis, contentStructures, prescription, aiPatternAnalysis };
+  // 8) ISR 처방전 생성 (일반 처방전 + AI 패턴 분석 통합)
+  const isrPrescription = generateIsrPrescription(
+    serpAnalysis,
+    contentStructures,
+    prescription,
+    aiPatternAnalysis
+  );
+
+  return { serpAnalysis, contentStructures, prescription, isrPrescription, aiPatternAnalysis };
 }
 
 /** 개별 URL 크롤링 + 분석 (실패 시 null) */
