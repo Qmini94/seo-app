@@ -71,6 +71,7 @@ export interface SerpAnalysis {
 /** 콘텐츠 구조 분석 */
 export interface ContentStructure {
   url: string;
+  domain: string;           // 도메인
   textLength: number;       // 본문 글자수
   keywordCount: number;     // 키워드 출현 횟수
   keywordDensity: number;   // 키워드 밀도 (%)
@@ -79,6 +80,7 @@ export interface ContentStructure {
   h3Count: number;          // H3 소제목 수
   imageCount: number;       // 이미지 수
   contentType: ContentType; // 콘텐츠 형태
+  aiCited: boolean;         // AI 브리핑에 인용되었는지
 }
 
 export type ContentType = "list" | "table" | "faq" | "step" | "general";
@@ -101,6 +103,32 @@ export interface ContentPrescription {
     imageCount: { min: number; avg: number };
     contentType: ContentType;
   };
+  /** AI 인용 콘텐츠 vs 일반 상위 콘텐츠 비교 */
+  aiCitedBenchmark: AiCitedComparison | null;
   channelDistribution: Record<string, number>;
   benchmarkCount: number;
+}
+
+/** AI 인용 콘텐츠와 일반 상위 콘텐츠의 구조 차이 */
+export interface AiCitedComparison {
+  citedCount: number;
+  nonCitedCount: number;
+  /** AI 인용된 콘텐츠의 평균 지표 */
+  cited: {
+    avgTextLength: number;
+    avgKeywordDensity: number;
+    avgH2Count: number;
+    avgImageCount: number;
+    dominantType: ContentType;
+  };
+  /** 일반 상위 콘텐츠의 평균 지표 */
+  nonCited: {
+    avgTextLength: number;
+    avgKeywordDensity: number;
+    avgH2Count: number;
+    avgImageCount: number;
+    dominantType: ContentType;
+  };
+  /** AI가 선호하는 패턴 요약 */
+  patterns: string[];
 }

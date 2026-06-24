@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import type { ContentStructure, ContentType } from "./serp.types";
+import { extractDomain } from "./parsers/base.parser";
 
 /**
  * 상위 콘텐츠 페이지 HTML을 분석하여 구조 데이터를 추출한다.
@@ -27,6 +28,7 @@ export function analyzeContent(url: string, html: string, keyword: string): Cont
 
   return {
     url,
+    domain: extractDomain(url),
     textLength: bodyText.length,
     keywordCount,
     keywordDensity: wordCount > 0 ? Math.round((keywordCount / wordCount) * 10000) / 100 : 0,
@@ -35,6 +37,7 @@ export function analyzeContent(url: string, html: string, keyword: string): Cont
     h3Count,
     imageCount,
     contentType,
+    aiCited: false, // 호출자가 설정
   };
 }
 
