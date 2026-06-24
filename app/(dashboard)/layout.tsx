@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 
 const NAV_ITEMS = [
+  { href: "/recommend", label: "AI 키워드 추천", icon: "🤖" },
   { href: "/keywords", label: "키워드 리서치", icon: "🔍" },
   { href: "/serp", label: "SERP 분석", icon: "📊" },
   // { href: "/audit", label: "사이트 진단", icon: "🩺" },
