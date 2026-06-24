@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import type { Element } from "domhandler";
 import type { ContentStructure, ContentType } from "./serp.types";
 import { extractDomain } from "./parsers/base.parser";
 
@@ -14,14 +15,14 @@ export function analyzeContent(url: string, html: string, keyword: string): Cont
   const $ = cheerio.load(html);
 
   // 불필요 요소 제거
-  $("script, style, nav, header, footer, .comment, #comment").remove();
+  $("script, style, nav, footer, .comment, #comment, .se-module-sticker, .se-module-oglink").remove();
 
   const title = extractTitle($);
   const bodyText = extractBodyText($);
   const keywordCount = countKeyword(bodyText, keyword);
   const wordCount = countWords(bodyText);
-  const h2Count = $("h2").length;
-  const h3Count = $("h3").length;
+  const h2Count = countHeadings($, "h2");
+  const h3Count = countHeadings($, "h3");
   const imageCount = countContentImages($);
 
   const contentType = classifyContentType($, bodyText);
@@ -42,65 +43,119 @@ export function analyzeContent(url: string, html: string, keyword: string): Cont
 }
 
 /**
- * 콘텐츠 이미지만 카운트 (UI/아이콘/트래커/스페이서 제외)
+ * 콘텐츠 이미지만 카운트 (UI/아이콘/트래커/스페이서/스티커 제외)
  *
- * 네이버 블로그에는 1px 스페이서, 배너, 프로필, 이모티콘 등
+ * 네이버 블로그에는 1px 스페이서, 배너, 프로필, 이모티콘, 스티커 등
  * 콘텐츠와 무관한 img 태그가 수십~수백 개 있어서 정밀 필터링 필요.
  */
 function countContentImages($: cheerio.CheerioAPI): number {
-  // 네이버 블로그: 본문 영역 내부 이미지만 카운트
+  // 네이버 블로그 스마트에디터: se-module-image 안의 이미지만 카운트 (가장 정확)
+  const seImageModules = $(".se-module-image img, .se-module-imageStrip img");
+  if (seImageModules.length > 0) {
+    return seImageModules.filter((_, el) => isContentImage($, el)).length;
+  }
+
+  // 네이버 블로그 구버전: postViewArea 안의 이미지
+  const $postView = $("#postViewArea");
+  if ($postView.length > 0) {
+    return $postView.find("img").filter((_, el) => isContentImage($, el)).length;
+  }
+
+  // 일반 웹페이지: 본문 영역 안의 이미지
   const $content =
-    $(".se-main-container").length > 0 ? $(".se-main-container") :
-    $("#postViewArea").length > 0 ? $("#postViewArea") :
-    $(".post_ct").length > 0 ? $(".post_ct") :
     $("article").length > 0 ? $("article") :
     $("main").length > 0 ? $("main") :
-    $("body");
+    $(".content, #content, .post-content, .entry-content").first();
 
-  return $content.find("img").filter((_, el) => {
-    const src = $(el).attr("src") ?? $(el).attr("data-lazy-src") ?? "";
-    if (!src || src.startsWith("data:")) return false;
+  const $scope = $content.length > 0 ? $content : $("body");
 
-    // UI/트래커/아이콘 패턴 제외
-    const excludePatterns = [
-      "pixel", "icon", "logo", "btn", "badge", "emoticon",
-      "spc.gif", "blank.gif", "spacer", "widget",
-      "static.naver", "ssl.pstatic.net/static",
-      "blogimgs.pstatic.net/nblog", // 블로그 UI 이미지
-    ];
-    if (excludePatterns.some((p) => src.includes(p))) return false;
-
-    // 너무 작은 이미지 제외 (80px 미만)
-    const width = parseInt($(el).attr("width") ?? "0") || 0;
-    const height = parseInt($(el).attr("height") ?? "0") || 0;
-    if ((width > 0 && width < 80) || (height > 0 && height < 80)) return false;
-
-    return true;
-  }).length;
+  return $scope.find("img").filter((_, el) => isContentImage($, el)).length;
 }
 
-/** 제목 추출 (og:title > title 태그 > h1) */
+/** 개별 img가 콘텐츠 이미지인지 판별 */
+function isContentImage($: cheerio.CheerioAPI, el: Element): boolean {
+  const src = $(el).attr("src") ?? $(el).attr("data-lazy-src") ?? $(el).attr("data-src") ?? "";
+  if (!src || src.startsWith("data:")) return false;
+
+  // UI/트래커/아이콘 패턴 제외
+  const excludePatterns = [
+    "pixel", "icon", "logo", "btn", "badge", "emoticon", "sticker",
+    "spc.gif", "blank.gif", "spacer", "widget", "banner", "ad_",
+    "static.naver", "ssl.pstatic.net/static",
+    "blogimgs.pstatic.net/nblog",   // 블로그 UI 이미지
+    "phinf.pstatic.net/contact",    // 프로필 이미지
+    "dthumb-phinf",                 // 썸네일 서비스
+    "github.com",                   // README 뱃지 등
+    ".svg",                         // 보통 아이콘
+    "/emoji/",
+    "/profile/",
+    "/avatar/",
+  ];
+  if (excludePatterns.some((p) => src.toLowerCase().includes(p))) return false;
+
+  // 너무 작은 이미지 제외 (100px 미만)
+  const width = parseInt($(el).attr("width") ?? "0") || 0;
+  const height = parseInt($(el).attr("height") ?? "0") || 0;
+  if ((width > 0 && width < 100) || (height > 0 && height < 100)) return false;
+
+  // CSS class로 UI 이미지 제외
+  const className = $(el).attr("class") ?? "";
+  const uiClasses = ["icon", "logo", "profile", "avatar", "emoji", "sticker"];
+  if (uiClasses.some((c) => className.toLowerCase().includes(c))) return false;
+
+  return true;
+}
+
+/** 제목 추출 (og:title > title 태그 > h1) — 사이트명 접미사 제거 */
 function extractTitle($: cheerio.CheerioAPI): string {
   const ogTitle = $('meta[property="og:title"]').attr("content");
-  if (ogTitle) return ogTitle.trim();
+  if (ogTitle && ogTitle.trim().length > 2) return cleanTitle(ogTitle.trim());
 
   const titleTag = $("title").text().trim();
-  if (titleTag) return titleTag;
+  if (titleTag && titleTag.length > 2) return cleanTitle(titleTag);
 
-  return $("h1").first().text().trim();
+  const h1 = $("h1").first().text().trim();
+  if (h1) return h1;
+
+  // 네이버 블로그 제목
+  const blogTitle = $(".se-title-text").text().trim() || $(".pcol1").text().trim();
+  if (blogTitle) return blogTitle;
+
+  return "";
+}
+
+/** 제목에서 사이트명 접미사 제거 (예: "글제목 - 네이버 블로그") */
+function cleanTitle(title: string): string {
+  return title
+    .replace(/\s*[-|:·]\s*(네이버\s*블로그|네이버\s*포스트|Naver|Blog)$/i, "")
+    .replace(/\s*[-|:·]\s*[^-|:·]{1,20}$/, (match) => {
+      // 접미사가 너무 짧으면 (사이트명) 제거, 아니면 유지
+      return match.trim().length < 15 ? "" : match;
+    })
+    .trim();
 }
 
 /** 본문 텍스트 추출 — 외부에서도 사용 */
 export function extractBodyText($: cheerio.CheerioAPI): string {
-  // 네이버 블로그 본문 영역
-  const blogContent =
-    $(".se-main-container").text() ||  // 스마트에디터
-    $("#postViewArea").text() ||        // 구버전
-    $(".post_ct").text();               // 포스트
-
-  if (blogContent.trim().length > 100) {
-    return cleanBodyText(blogContent);
+  // 네이버 블로그 본문 영역 (스마트에디터 텍스트 컴포넌트만)
+  const seTexts = $(".se-main-container .se-module-text");
+  if (seTexts.length > 0) {
+    const texts: string[] = [];
+    seTexts.each((_, el) => {
+      const text = $(el).text().trim();
+      if (text) texts.push(text);
+    });
+    const combined = texts.join(" ");
+    if (combined.length > 100) return cleanBodyText(combined);
   }
+
+  // 네이버 블로그 구버전
+  const postView = $("#postViewArea").text();
+  if (postView && postView.trim().length > 100) return cleanBodyText(postView);
+
+  // 네이버 포스트
+  const postCt = $(".post_ct").text();
+  if (postCt && postCt.trim().length > 100) return cleanBodyText(postCt);
 
   // 일반 웹페이지: article > main > body
   const article = $("article").text();
@@ -116,17 +171,36 @@ function cleanBodyText(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
-/** 키워드 출현 횟수 (공백 무시 매칭) */
+/**
+ * 키워드 출현 횟수 (공백 무시 매칭 + 부분 키워드 매칭)
+ *
+ * "포항 카페추천" → "포항카페추천" 전체 매칭 + "포항" / "카페추천" 개별 매칭
+ * 최종 값은 전체 매칭 우선, 0이면 부분 키워드 최소 출현 수 사용
+ */
 function countKeyword(text: string, keyword: string): number {
   const normalized = text.replace(/\s/g, "").toLowerCase();
   const target = keyword.replace(/\s/g, "").toLowerCase();
   if (!target) return 0;
 
+  // 1) 전체 키워드 매칭
+  const fullCount = countOccurrences(normalized, target);
+  if (fullCount > 0) return fullCount;
+
+  // 2) 공백으로 분리된 부분 키워드 매칭 (전체 매칭 0일 때)
+  const parts = keyword.trim().split(/\s+/).filter((p) => p.length >= 2);
+  if (parts.length <= 1) return 0;
+
+  // 각 부분 키워드 출현 횟수 중 최소값 = 키워드 조합이 함께 나타난 횟수 근사
+  const partCounts = parts.map((p) => countOccurrences(normalized, p.toLowerCase()));
+  return Math.min(...partCounts);
+}
+
+function countOccurrences(haystack: string, needle: string): number {
   let count = 0;
   let pos = 0;
-  while ((pos = normalized.indexOf(target, pos)) !== -1) {
+  while ((pos = haystack.indexOf(needle, pos)) !== -1) {
     count++;
-    pos += target.length;
+    pos += needle.length;
   }
   return count;
 }
@@ -135,15 +209,39 @@ function countKeyword(text: string, keyword: string): number {
 function countWords(text: string): number {
   const cleaned = text.replace(/\s+/g, " ").trim();
   if (!cleaned) return 0;
-  // 한국어 중심이라 공백 기준 분리 + 영어 단어 카운트
   return cleaned.split(/\s+/).length;
+}
+
+/** 소제목 카운트 (본문 영역 내부만) */
+function countHeadings($: cheerio.CheerioAPI, tag: string): number {
+  // 네이버 블로그: se-main-container 내부만
+  if ($(".se-main-container").length > 0) {
+    return $(".se-main-container").find(tag).length;
+  }
+  if ($("#postViewArea").length > 0) {
+    return $("#postViewArea").find(tag).length;
+  }
+
+  // 일반 웹페이지
+  const $scope =
+    $("article").length > 0 ? $("article") :
+    $("main").length > 0 ? $("main") :
+    $("body");
+
+  return $scope.find(tag).length;
 }
 
 /** 콘텐츠 형태 분류 */
 function classifyContentType($: cheerio.CheerioAPI, bodyText: string): ContentType {
-  const olCount = $("ol").length;
-  const ulCount = $("ul").length;
-  const tableCount = $("table").length;
+  const $scope =
+    $(".se-main-container").length > 0 ? $(".se-main-container") :
+    $("article").length > 0 ? $("article") :
+    $("main").length > 0 ? $("main") :
+    $("body");
+
+  const olCount = $scope.find("ol").length;
+  const ulCount = $scope.find("ul").length;
+  const tableCount = $scope.find("table").length;
   const lowerText = bodyText.toLowerCase();
 
   // FAQ 패턴: Q&A, 질문/답변 반복

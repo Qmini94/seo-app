@@ -46,19 +46,38 @@ export async function crawlContentPage(url: string): Promise<string> {
     await page.setUserAgent(UA);
     await page.setViewport({ width: 1280, height: 800 });
 
-    await page.goto(url, { waitUntil: "networkidle2", timeout: 15000 });
+    // 모바일 블로그 URL → PC URL로 변환 (iframe 구조 접근 위해)
+    const normalizedUrl = normalizeNaverBlogUrl(url);
+
+    await page.goto(normalizedUrl, { waitUntil: "networkidle2", timeout: 15000 });
 
     // 네이버 블로그: iframe#mainFrame 안에 본문이 있음
-    if (url.includes("blog.naver.com")) {
+    if (isNaverBlog(normalizedUrl)) {
       const blogHtml = await extractNaverBlogContent(page);
       if (blogHtml) return blogHtml;
     }
 
-    // 일반 웹페이지
+    // 일반 웹페이지: 동적 콘텐츠 로딩 대기
+    await page.waitForSelector("article, main, .content, #content", { timeout: 3000 }).catch(() => {});
+
     return await page.content();
   } finally {
     await page.close();
   }
+}
+
+/** 네이버 블로그 URL 판별 (m.blog 포함) */
+function isNaverBlog(url: string): boolean {
+  return /(?:m\.)?blog\.naver\.com/.test(url) || url.includes("post.naver.com");
+}
+
+/**
+ * 모바일 블로그 URL을 PC URL로 변환
+ * m.blog.naver.com/userId/postId → blog.naver.com/userId/postId
+ * 이유: PC 버전이 iframe 구조이고 본문 추출이 안정적
+ */
+function normalizeNaverBlogUrl(url: string): string {
+  return url.replace("m.blog.naver.com", "blog.naver.com");
 }
 
 /**
@@ -67,16 +86,29 @@ export async function crawlContentPage(url: string): Promise<string> {
  */
 async function extractNaverBlogContent(page: import("puppeteer").Page): Promise<string | null> {
   try {
-    // mainFrame iframe 찾기
+    // iframe 로딩 대기 (최대 5초)
+    await page.waitForSelector("iframe#mainFrame", { timeout: 5000 }).catch(() => {});
+
+    // mainFrame iframe 찾기 — 다양한 URL 패턴 대응
     const mainFrame = page.frames().find((f) => {
       const frameUrl = f.url();
-      return frameUrl.includes("PostView.naver") || frameUrl.includes("PostList.naver");
+      return (
+        frameUrl.includes("PostView.naver") ||
+        frameUrl.includes("PostList.naver") ||
+        frameUrl.includes("blogId=") ||
+        (frameUrl.includes("blog.naver.com") && frameUrl !== page.url())
+      );
     });
 
     if (!mainFrame) return null;
 
     // 본문 영역 로딩 대기
-    await mainFrame.waitForSelector(".se-main-container, #postViewArea, .post_ct", { timeout: 5000 }).catch(() => {});
+    await mainFrame
+      .waitForSelector(".se-main-container, #postViewArea, .post_ct", { timeout: 8000 })
+      .catch(() => {});
+
+    // 추가 로딩 대기 (이미지 lazy-load 등)
+    await new Promise((r) => setTimeout(r, 1000));
 
     return await mainFrame.content();
   } catch {
