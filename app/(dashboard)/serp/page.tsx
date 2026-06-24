@@ -3,15 +3,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { SerpAnalysis, ContentStructure, ContentPrescription } from "@/features/serp/serp.types";
+import type { SerpAnalysis, ContentStructure, ContentPrescription, IsrPrescription } from "@/features/serp/serp.types";
+import type { AiPatternAnalysis } from "@/features/serp/ai-pattern.analyzer";
 import SerpOverview from "./_components/SerpOverview";
 import PrescriptionCard from "./_components/PrescriptionCard";
 import ContentBenchmark from "./_components/ContentBenchmark";
+import IsrPrescriptionCard from "./_components/IsrPrescriptionCard";
 
 interface ApiResponse {
   serpAnalysis: SerpAnalysis;
   contentStructures: ContentStructure[];
   prescription: ContentPrescription;
+  isrPrescription: IsrPrescription;
+  aiPatternAnalysis: AiPatternAnalysis | null;
 }
 
 export default function SerpPage() {
@@ -48,9 +52,9 @@ export default function SerpPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">SERP 분석</h2>
+        <h2 className="text-2xl font-bold tracking-tight">SERP 분석 + ISR 처방전</h2>
         <p className="text-muted-foreground mt-1">
-          키워드의 검색결과 구조를 분석하고 콘텐츠 처방전을 생성합니다.
+          키워드의 검색결과 구조를 분석하고 AI 브리핑 인용 최적화 가이드를 생성합니다.
         </p>
       </div>
 
@@ -81,6 +85,7 @@ export default function SerpPage() {
 
       {result && !isLoading && (
         <div className="space-y-6">
+          <IsrPrescriptionCard prescription={result.isrPrescription} />
           <PrescriptionCard prescription={result.prescription} />
           <SerpOverview serpAnalysis={result.serpAnalysis} />
           <ContentBenchmark

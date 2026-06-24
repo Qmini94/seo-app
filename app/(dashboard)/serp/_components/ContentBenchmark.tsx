@@ -45,7 +45,7 @@ export default function ContentBenchmark({ structures, keyword }: Props) {
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">#</TableHead>
-              <TableHead className="min-w-[200px]">URL</TableHead>
+              <TableHead className="min-w-[150px]">도메인</TableHead>
               <TableHead className="text-right">글자수</TableHead>
               <TableHead className="text-right">키워드</TableHead>
               <TableHead className="text-right">밀도</TableHead>
@@ -57,10 +57,15 @@ export default function ContentBenchmark({ structures, keyword }: Props) {
           </TableHeader>
           <TableBody>
             {structures.map((s, i) => (
-              <TableRow key={s.url}>
-                <TableCell className="text-muted-foreground">{i + 1}</TableCell>
+              <TableRow key={s.url} className={s.aiCited ? "bg-blue-50/50 dark:bg-blue-950/30" : ""}>
+                <TableCell className="text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    {i + 1}
+                    {s.aiCited && <span title="AI 인용" className="text-blue-500 text-[10px]">AI</span>}
+                  </div>
+                </TableCell>
                 <TableCell className="max-w-[250px] truncate text-xs text-muted-foreground">
-                  {s.url}
+                  {s.domain}
                 </TableCell>
                 <TableCell className="text-right">
                   {s.textLength.toLocaleString()}
