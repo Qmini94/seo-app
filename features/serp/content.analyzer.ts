@@ -21,11 +21,7 @@ export function analyzeContent(url: string, html: string, keyword: string): Cont
   const wordCount = countWords(bodyText);
   const h2Count = $("h2").length;
   const h3Count = $("h3").length;
-  const imageCount = $("img").filter((_, el) => {
-    const src = $(el).attr("src") ?? "";
-    // 아이콘/트래커 이미지 제외
-    return src.length > 0 && !src.includes("pixel") && !src.includes("icon") && !src.includes("logo");
-  }).length;
+  const imageCount = countContentImages($);
 
   const contentType = classifyContentType($, bodyText);
 
@@ -40,6 +36,44 @@ export function analyzeContent(url: string, html: string, keyword: string): Cont
     imageCount,
     contentType,
   };
+}
+
+/**
+ * 콘텐츠 이미지만 카운트 (UI/아이콘/트래커/스페이서 제외)
+ *
+ * 네이버 블로그에는 1px 스페이서, 배너, 프로필, 이모티콘 등
+ * 콘텐츠와 무관한 img 태그가 수십~수백 개 있어서 정밀 필터링 필요.
+ */
+function countContentImages($: cheerio.CheerioAPI): number {
+  // 네이버 블로그: 본문 영역 내부 이미지만 카운트
+  const $content =
+    $(".se-main-container").length > 0 ? $(".se-main-container") :
+    $("#postViewArea").length > 0 ? $("#postViewArea") :
+    $(".post_ct").length > 0 ? $(".post_ct") :
+    $("article").length > 0 ? $("article") :
+    $("main").length > 0 ? $("main") :
+    $("body");
+
+  return $content.find("img").filter((_, el) => {
+    const src = $(el).attr("src") ?? $(el).attr("data-lazy-src") ?? "";
+    if (!src || src.startsWith("data:")) return false;
+
+    // UI/트래커/아이콘 패턴 제외
+    const excludePatterns = [
+      "pixel", "icon", "logo", "btn", "badge", "emoticon",
+      "spc.gif", "blank.gif", "spacer", "widget",
+      "static.naver", "ssl.pstatic.net/static",
+      "blogimgs.pstatic.net/nblog", // 블로그 UI 이미지
+    ];
+    if (excludePatterns.some((p) => src.includes(p))) return false;
+
+    // 너무 작은 이미지 제외 (80px 미만)
+    const width = parseInt($(el).attr("width") ?? "0") || 0;
+    const height = parseInt($(el).attr("height") ?? "0") || 0;
+    if ((width > 0 && width < 80) || (height > 0 && height < 80)) return false;
+
+    return true;
+  }).length;
 }
 
 /** 제목 추출 (og:title > title 태그 > h1) */
