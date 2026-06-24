@@ -2,6 +2,7 @@ import { crawlNaverSerp, crawlContentPage } from "@/infrastructure/crawler/serp.
 import { parseSerpHtml } from "./serp.parser";
 import { analyzeContent } from "./content.analyzer";
 import { generatePrescription } from "./prescription.generator";
+import { analyzeAiCitationPattern, type AiPatternAnalysis } from "./ai-pattern.analyzer";
 import type { SerpAnalysis, ContentStructure, ContentPrescription } from "./serp.types";
 
 const MAX_CONTENT_CRAWL = 5;   // 일반 상위 콘텐츠 최대 크롤링 수
@@ -21,6 +22,7 @@ export async function analyzeSerpForKeyword(keyword: string): Promise<{
   serpAnalysis: SerpAnalysis;
   contentStructures: ContentStructure[];
   prescription: ContentPrescription;
+  aiPatternAnalysis: AiPatternAnalysis | null;
 }> {
   // 1) SERP 크롤링 + 파싱
   const serpHtml = await crawlNaverSerp(keyword);
@@ -66,7 +68,17 @@ export async function analyzeSerpForKeyword(keyword: string): Promise<{
   // 6) 처방전 생성
   const prescription = generatePrescription(serpAnalysis, contentStructures);
 
-  return { serpAnalysis, contentStructures, prescription };
+  // 7) AI 패턴 심층 분석 (Claude 활용 — AI 브리핑이 있을 때만)
+  let aiPatternAnalysis: AiPatternAnalysis | null = null;
+  if (serpAnalysis.aiBriefing.exists && process.env.ANTHROPIC_API_KEY) {
+    aiPatternAnalysis = await analyzeAiCitationPattern(
+      keyword,
+      serpAnalysis.aiBriefing,
+      contentStructures
+    );
+  }
+
+  return { serpAnalysis, contentStructures, prescription, aiPatternAnalysis };
 }
 
 /** 개별 URL 크롤링 + 분석 (실패 시 null) */

@@ -90,8 +90,8 @@ function extractTitle($: cheerio.CheerioAPI): string {
   return $("h1").first().text().trim();
 }
 
-/** 본문 텍스트 추출 */
-function extractBodyText($: cheerio.CheerioAPI): string {
+/** 본문 텍스트 추출 — 외부에서도 사용 */
+export function extractBodyText($: cheerio.CheerioAPI): string {
   // 네이버 블로그 본문 영역
   const blogContent =
     $(".se-main-container").text() ||  // 스마트에디터
