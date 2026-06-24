@@ -56,8 +56,20 @@ export default function SerpOverview({ serpAnalysis: serp }: Props) {
                   </TableCell>
                   <TableCell className="max-w-[400px]">
                     {section.results.slice(0, 3).map((r) => (
-                      <div key={r.rank} className="text-xs text-muted-foreground truncate">
-                        {r.rank}. {r.title}
+                      <div key={r.rank} className="text-xs truncate">
+                        {r.rank}.{" "}
+                        {r.url ? (
+                          <a
+                            href={r.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            {r.title || r.domain}
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground">{r.title}</span>
+                        )}
                       </div>
                     ))}
                   </TableCell>
@@ -73,7 +85,15 @@ export default function SerpOverview({ serpAnalysis: serp }: Props) {
           <p className="text-sm font-semibold mb-2">AI 브리핑 인용 소스</p>
           <div className="space-y-1">
             {serp.aiBriefing.citedUrls.map((url) => (
-              <p key={url} className="text-xs text-muted-foreground truncate">{url}</p>
+              <a
+                key={url}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
+              >
+                {url}
+              </a>
             ))}
           </div>
         </div>

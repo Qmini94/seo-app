@@ -38,6 +38,9 @@ export default function ContentBenchmark({ structures, keyword }: Props) {
       <div className="flex items-center gap-2">
         <h3 className="text-lg font-semibold">상위 콘텐츠 벤치마크</h3>
         <Badge variant="outline">{structures.length}개 분석</Badge>
+        <span className="text-xs text-muted-foreground">
+          &quot;{keyword}&quot; 상위 노출 + AI 인용 콘텐츠 구조
+        </span>
       </div>
 
       <div className="rounded-md border overflow-x-auto">
@@ -45,11 +48,10 @@ export default function ContentBenchmark({ structures, keyword }: Props) {
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">#</TableHead>
-              <TableHead className="min-w-[150px]">도메인</TableHead>
+              <TableHead className="min-w-[180px]">소스</TableHead>
               <TableHead className="text-right">글자수</TableHead>
               <TableHead className="text-right">키워드</TableHead>
               <TableHead className="text-right">밀도</TableHead>
-              <TableHead className="text-right">제목</TableHead>
               <TableHead className="text-right">H2</TableHead>
               <TableHead className="text-right">이미지</TableHead>
               <TableHead>형태</TableHead>
@@ -61,22 +63,37 @@ export default function ContentBenchmark({ structures, keyword }: Props) {
                 <TableCell className="text-muted-foreground">
                   <div className="flex items-center gap-1">
                     {i + 1}
-                    {s.aiCited && <span title="AI 인용" className="text-blue-500 text-[10px]">AI</span>}
+                    {s.aiCited && (
+                      <Badge variant="secondary" className="text-[9px] px-1 py-0 leading-tight">
+                        AI
+                      </Badge>
+                    )}
                   </div>
                 </TableCell>
-                <TableCell className="max-w-[250px] truncate text-xs text-muted-foreground">
-                  {s.domain}
+                <TableCell>
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline block truncate max-w-[250px]"
+                    title={s.url}
+                  >
+                    {s.domain}
+                  </a>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right font-mono text-xs">
                   {s.textLength.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right">{s.keywordCount}회</TableCell>
-                <TableCell className="text-right">{s.keywordDensity}%</TableCell>
-                <TableCell className="text-right">{s.titleLength}자</TableCell>
-                <TableCell className="text-right">{s.h2Count}</TableCell>
-                <TableCell className="text-right">{s.imageCount}</TableCell>
+                <TableCell className="text-right font-mono text-xs">
+                  {s.keywordCount}회
+                </TableCell>
+                <TableCell className="text-right font-mono text-xs">
+                  {s.keywordDensity}%
+                </TableCell>
+                <TableCell className="text-right font-mono text-xs">{s.h2Count}</TableCell>
+                <TableCell className="text-right font-mono text-xs">{s.imageCount}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">
+                  <Badge variant="outline" className="text-[10px]">
                     {CONTENT_TYPE_LABEL[s.contentType] ?? s.contentType}
                   </Badge>
                 </TableCell>
