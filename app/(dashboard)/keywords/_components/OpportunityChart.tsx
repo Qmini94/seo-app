@@ -19,7 +19,9 @@ interface Props {
   keywords: RelatedKeyword[];
 }
 
-const competitionValue: Record<string, number> = {
+import type { Competition } from "@/features/keyword/keyword.types";
+
+const competitionValue: Record<Competition, number> = {
   낮음: 1,
   중간: 2,
   높음: 3,
@@ -150,9 +152,14 @@ export default function OpportunityChart({ keywords }: Props) {
   );
 }
 
-function CustomTooltip({ active, payload }: any) {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: { payload: ChartItem }[];
+}
+
+function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
-  const d = payload[0].payload as ChartItem;
+  const d = payload[0].payload;
   return (
     <div className="rounded-md border bg-popover p-3 text-sm shadow-md space-y-1">
       <p className="font-semibold">{d.keyword}</p>

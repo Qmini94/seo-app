@@ -3,12 +3,18 @@
 import { useState } from "react";
 import ProfileForm from "./_components/ProfileForm";
 import RecommendResult from "./_components/RecommendResult";
+import type { BusinessProfile } from "@/features/keyword/seed-generator";
+import type { RelatedKeyword } from "@/features/keyword/keyword.types";
+
+interface RecommendKeyword extends RelatedKeyword {
+  category: string;
+}
 
 interface ApiResponse {
-  profile: any;
+  profile: BusinessProfile;
   generated: number;
   validated: number;
-  keywords: any[];
+  keywords: RecommendKeyword[];
 }
 
 export default function RecommendPage() {

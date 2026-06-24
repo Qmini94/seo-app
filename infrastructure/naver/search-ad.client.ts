@@ -21,17 +21,31 @@ function buildHeaders(method: string, uri: string): Record<string, string> {
   };
 }
 
+import type { Competition } from "@/features/keyword/keyword.types";
+
 export interface NaverKeywordRaw {
   keyword: string;
   monthlyPcSearch: number;
   monthlyMobileSearch: number;
   monthlyTotalSearch: number;
-  competition: string;
+  competition: Competition;
   monthlyAvePcClick: number;
   monthlyAveMobileClick: number;
   monthlyAveTotalClick: number;
   pcCtr: number;
   mobileCtr: number;
+}
+
+/** 네이버 검색광고 API 원본 응답 아이템 */
+interface NaverKeywordApiItem {
+  relKeyword: string;
+  monthlyPcQcCnt: number | string;
+  monthlyMobileQcCnt: number | string;
+  compIdx: string;
+  monthlyAvePcClkCnt: number | string;
+  monthlyAveMobileClkCnt: number | string;
+  monthlyAvePcCtr: number | string;
+  monthlyAveMobileCtr: number | string;
 }
 
 // 네이버는 검색량 적은 키워드에 숫자 대신 "< 10" 문자열을 준다 → 숫자로 정리
@@ -57,22 +71,22 @@ export async function fetchRelatedKeywords(seed: string): Promise<NaverKeywordRa
     throw new Error(`Naver SearchAd API ${res.status}: ${await res.text()}`);
   }
 
-  const data = await res.json();
-  const list = (data.keywordList ?? []) as any[];
+  const data: { keywordList?: NaverKeywordApiItem[] } = await res.json();
+  const list = data.keywordList ?? [];
 
   return list.map((k) => {
     const pc = parseCount(k.monthlyPcQcCnt);
     const mobile = parseCount(k.monthlyMobileQcCnt);
-    const pcClick = parseFloat(k.monthlyAvePcClkCnt) || 0;
-    const mobileClick = parseFloat(k.monthlyAveMobileClkCnt) || 0;
-    const pcCtr = parseFloat(k.monthlyAvePcCtr) || 0;
-    const mobileCtr = parseFloat(k.monthlyAveMobileCtr) || 0;
+    const pcClick = parseFloat(String(k.monthlyAvePcClkCnt)) || 0;
+    const mobileClick = parseFloat(String(k.monthlyAveMobileClkCnt)) || 0;
+    const pcCtr = parseFloat(String(k.monthlyAvePcCtr)) || 0;
+    const mobileCtr = parseFloat(String(k.monthlyAveMobileCtr)) || 0;
     return {
       keyword: k.relKeyword,
       monthlyPcSearch: pc,
       monthlyMobileSearch: mobile,
       monthlyTotalSearch: pc + mobile,
-      competition: k.compIdx,
+      competition: k.compIdx as Competition,
       monthlyAvePcClick: pcClick,
       monthlyAveMobileClick: mobileClick,
       monthlyAveTotalClick: Math.round(pcClick + mobileClick),

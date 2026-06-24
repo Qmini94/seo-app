@@ -11,7 +11,9 @@
  * 결과: 0~100 점수 (높을수록 기회 큼)
  */
 
-const competitionWeight: Record<string, number> = {
+import type { Competition } from "./keyword.types";
+
+const competitionWeight: Record<Competition, number> = {
   높음: 0.9,
   중간: 0.5,
   낮음: 0.1,
@@ -31,7 +33,7 @@ function normalizeDemand(searchVolume: number, maxVolume: number): number {
 
 interface OpportunityInput {
   monthlyTotalSearch: number;
-  competition: string;
+  competition: Competition;
   relevance: number;
 }
 

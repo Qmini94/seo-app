@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { RelatedKeyword } from "@/features/keyword/keyword.types";
+import type { RelatedKeyword, Competition } from "@/features/keyword/keyword.types";
 import { INTENT_LABEL, type SearchIntent } from "@/features/keyword/intent.classifier";
 import { Badge } from "@/components/ui/badge";
+
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 import {
   Table,
   TableBody,
@@ -18,7 +20,7 @@ interface Props {
   keywords: RelatedKeyword[];
 }
 
-const competitionColor: Record<string, string> = {
+const competitionColor: Record<Competition, BadgeVariant> = {
   높음: "destructive",
   중간: "secondary",
   낮음: "default",
@@ -44,7 +46,7 @@ const intentOrder: Record<SearchIntent, number> = {
   navigational: 1,
 };
 
-const intentColor: Record<SearchIntent, string> = {
+const intentColor: Record<SearchIntent, BadgeVariant> = {
   transactional: "destructive",
   commercial: "default",
   informational: "secondary",
@@ -245,7 +247,7 @@ export default function KeywordResult({ seed, keywords }: Props) {
                 <TableCell>
                   <Badge
                     variant={
-                      (competitionColor[kw.competition] as any) ?? "outline"
+                      competitionColor[kw.competition] ?? "outline"
                     }
                   >
                     {kw.competition || "-"}
@@ -266,7 +268,7 @@ export default function KeywordResult({ seed, keywords }: Props) {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={(intentColor[kw.intent] as any) ?? "outline"}>
+                  <Badge variant={intentColor[kw.intent] ?? "outline"}>
                     {INTENT_LABEL[kw.intent]}
                   </Badge>
                 </TableCell>

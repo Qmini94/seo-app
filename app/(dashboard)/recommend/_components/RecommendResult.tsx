@@ -22,7 +22,9 @@ interface Props {
   keywords: RecommendKeyword[];
 }
 
-const intentColor: Record<SearchIntent, string> = {
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+
+const intentColor: Record<SearchIntent, BadgeVariant> = {
   transactional: "destructive",
   commercial: "default",
   informational: "secondary",
@@ -105,7 +107,7 @@ export default function RecommendResult({ generated, validated, keywords }: Prop
                   </span>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={(intentColor[kw.intent] as any) ?? "outline"}>
+                  <Badge variant={intentColor[kw.intent] ?? "outline"}>
                     {INTENT_LABEL[kw.intent]}
                   </Badge>
                 </TableCell>

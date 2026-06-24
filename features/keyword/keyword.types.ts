@@ -1,11 +1,13 @@
 import type { SearchIntent } from "./intent.classifier";
 
+export type Competition = "높음" | "중간" | "낮음";
+
 export interface RelatedKeyword {
   keyword: string;
   monthlyPcSearch: number;
   monthlyMobileSearch: number;
   monthlyTotalSearch: number;
-  competition: string; // 높음 / 중간 / 낮음
+  competition: Competition;
   monthlyAvePcClick: number;
   monthlyAveMobileClick: number;
   monthlyAveTotalClick: number;
