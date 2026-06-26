@@ -1,4 +1,4 @@
-import { crawlNaverSerp, crawlContentPage } from "@/infrastructure/crawler/serp.crawler";
+import { crawlNaverSerp, crawlContentPage } from "@infra/crawler";
 import { parseSerpHtml } from "./serp.parser";
 import { analyzeContent } from "./content.analyzer";
 import { generatePrescription } from "./prescription.generator";

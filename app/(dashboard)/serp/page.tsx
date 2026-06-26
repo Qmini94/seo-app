@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import type { SerpAnalysis, ContentStructure, ContentPrescription, IsrPrescription } from "@/features/serp/serp.types";
-import type { AiPatternAnalysis } from "@/features/serp/ai-pattern.analyzer";
+import { Button } from "@ui/button";
+import { Input } from "@ui/input";
+import type { SerpAnalysis, ContentStructure, ContentPrescription, IsrPrescription } from "@core/serp/serp.types";
+import type { AiPatternAnalysis } from "@core/serp/ai-pattern.analyzer";
 import SerpOverview from "./_components/SerpOverview";
 import PrescriptionCard from "./_components/PrescriptionCard";
 import ContentBenchmark from "./_components/ContentBenchmark";

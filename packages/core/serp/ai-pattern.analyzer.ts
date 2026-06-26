@@ -1,5 +1,5 @@
-import { askClaudeJson } from "@/infrastructure/ai/claude.client";
-import { crawlContentPage } from "@/infrastructure/crawler/serp.crawler";
+import { askClaudeJson } from "@infra/ai";
+import { crawlContentPage } from "@infra/crawler";
 import { extractBodyText } from "./content.analyzer";
 import * as cheerio from "cheerio";
 import type { AiBriefingData, ContentStructure } from "./serp.types";

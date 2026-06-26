@@ -1,4 +1,4 @@
-import { askClaudeJson } from "@/infrastructure/ai/claude.client";
+import { askClaudeJson } from "@infra/ai";
 
 export interface BusinessProfile {
   industry: string;      // 업종 (예: "보일러 시공")

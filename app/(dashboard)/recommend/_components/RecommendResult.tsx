@@ -1,8 +1,8 @@
 "use client";
 
-import type { RelatedKeyword } from "@/features/keyword/keyword.types";
-import { INTENT_LABEL, type SearchIntent } from "@/features/keyword/intent.classifier";
-import { Badge } from "@/components/ui/badge";
+import type { RelatedKeyword } from "@core/keyword";
+import { INTENT_LABEL, type SearchIntent } from "@core/keyword";
+import { Badge } from "@ui/badge";
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@ui/table";
 
 interface RecommendKeyword extends RelatedKeyword {
   category: string;

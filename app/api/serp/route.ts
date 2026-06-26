@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { analyzeSerpForKeyword } from "@/features/serp/serp.service";
+import { analyzeSerpForKeyword } from "@core/serp";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);

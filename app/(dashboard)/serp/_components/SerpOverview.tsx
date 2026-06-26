@@ -1,8 +1,8 @@
 "use client";
 
-import type { SerpAnalysis } from "@/features/serp/serp.types";
-import { SECTION_LABEL } from "@/features/serp/serp.types";
-import { Badge } from "@/components/ui/badge";
+import type { SerpAnalysis } from "@core/serp/serp.types";
+import { SECTION_LABEL } from "@core/serp/serp.types";
+import { Badge } from "@ui/badge";
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@ui/table";
 
 interface Props {
   serpAnalysis: SerpAnalysis;

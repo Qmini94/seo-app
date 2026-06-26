@@ -3,8 +3,7 @@
 import { useState } from "react";
 import ProfileForm from "./_components/ProfileForm";
 import RecommendResult from "./_components/RecommendResult";
-import type { BusinessProfile } from "@/features/keyword/seed-generator";
-import type { RelatedKeyword } from "@/features/keyword/keyword.types";
+import type { BusinessProfile, RelatedKeyword } from "@core/keyword";
 
 interface RecommendKeyword extends RelatedKeyword {
   category: string;

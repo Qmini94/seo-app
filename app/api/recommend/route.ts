@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateSeedKeywords, type BusinessProfile } from "@/features/keyword/seed-generator";
-import { validateAndScoreSeeds } from "@/features/keyword/keyword.service";
+import { generateSeedKeywords, type BusinessProfile, validateAndScoreSeeds } from "@core/keyword";
 
 export async function POST(req: Request) {
   let body: BusinessProfile;

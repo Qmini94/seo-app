@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { RelatedKeyword } from "@/features/keyword/keyword.types";
+import type { RelatedKeyword } from "@core/keyword";
 import KeywordSearch from "./_components/KeywordSearch";
 import KeywordResult from "./_components/KeywordResult";
 import OpportunityChart from "./_components/OpportunityChart";

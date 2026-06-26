@@ -1,4 +1,4 @@
-import { fetchRelatedKeywords, type NaverKeywordRaw } from "@/infrastructure/naver/search-ad.client";
+import { fetchRelatedKeywords, type NaverKeywordRaw } from "@infra/naver";
 import { classifyIntent } from "./intent.classifier";
 import { scoreRelevance } from "./relevance.scorer";
 import { scoreOpportunity } from "./opportunity.scorer";

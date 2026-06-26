@@ -12,14 +12,12 @@ import {
   ReferenceArea,
   ZAxis,
 } from "recharts";
-import type { RelatedKeyword } from "@/features/keyword/keyword.types";
-import { INTENT_LABEL } from "@/features/keyword/intent.classifier";
+import type { RelatedKeyword, Competition } from "@core/keyword";
+import { INTENT_LABEL } from "@core/keyword";
 
 interface Props {
   keywords: RelatedKeyword[];
 }
-
-import type { Competition } from "@/features/keyword/keyword.types";
 
 const competitionValue: Record<Competition, number> = {
   낮음: 1,

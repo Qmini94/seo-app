@@ -1,7 +1,7 @@
 "use client";
 
-import type { IsrPrescription, IsrStrategy } from "@/features/serp/serp.types";
-import { Badge } from "@/components/ui/badge";
+import type { IsrPrescription, IsrStrategy } from "@core/serp/serp.types";
+import { Badge } from "@ui/badge";
 
 interface Props {
   prescription: IsrPrescription;

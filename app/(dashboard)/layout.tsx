@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@ui/separator";
 
 const NAV_ITEMS = [
   { href: "/recommend", label: "AI 키워드 추천", icon: "🤖" },

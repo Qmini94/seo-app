@@ -1,7 +1,7 @@
 "use client";
 
-import type { ContentStructure } from "@/features/serp/serp.types";
-import { Badge } from "@/components/ui/badge";
+import type { ContentStructure } from "@core/serp/serp.types";
+import { Badge } from "@ui/badge";
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@ui/table";
 
 interface Props {
   structures: ContentStructure[];

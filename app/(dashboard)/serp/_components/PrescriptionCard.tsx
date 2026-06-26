@@ -1,7 +1,7 @@
 "use client";
 
-import type { ContentPrescription } from "@/features/serp/serp.types";
-import { Badge } from "@/components/ui/badge";
+import type { ContentPrescription } from "@core/serp/serp.types";
+import { Badge } from "@ui/badge";
 
 interface Props {
   prescription: ContentPrescription;

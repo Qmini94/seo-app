@@ -21,7 +21,7 @@ function buildHeaders(method: string, uri: string): Record<string, string> {
   };
 }
 
-import type { Competition } from "@/features/keyword/keyword.types";
+import type { Competition } from "@core/keyword/keyword.types";
 
 export interface NaverKeywordRaw {
   keyword: string;

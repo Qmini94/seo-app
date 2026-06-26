@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { RelatedKeyword, Competition } from "@/features/keyword/keyword.types";
-import { INTENT_LABEL, type SearchIntent } from "@/features/keyword/intent.classifier";
-import { Badge } from "@/components/ui/badge";
+import type { RelatedKeyword, Competition } from "@core/keyword";
+import { INTENT_LABEL, type SearchIntent } from "@core/keyword";
+import { Badge } from "@ui/badge";
 
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 import {
@@ -13,7 +13,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@ui/table";
 
 interface Props {
   seed: string;
